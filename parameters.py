@@ -5,12 +5,14 @@ from io import StringIO
 # file_paths = os.listdir(csv_dir)  # Get all files in the directory
 
 
-def extract(uploaded_files):
+def extract(uploaded_files, skip_params):
     unique_parameters = {}
 
     for f in uploaded_files:
         # Get the filename without the extension
-        filename = f.name
+        filename = f.name.replace(".csv","")
+
+        print(filename)
 
         reader = csv.DictReader(f.getvalue().decode("utf-8").splitlines())
         for row in reader:
@@ -30,19 +32,17 @@ def extract(uploaded_files):
                 if filename not in unique_parameters[param_name]['files']:
                     unique_parameters[param_name]['files'].append(filename)
 
-    skip_params = ["ANALYTICAL_PROPERTIES", "IFC", "DATA"]
     # Now, write the unique parameters to a new CSV file
     output = []
-    fieldnames = ['Name', 'StorageType', 'IsInstance', 'Build-in', 'Parameter Category', 'Families']
     for param_name, data in unique_parameters.items():
         if data['details'][3] in skip_params:
             continue
         row = [param_name] + list(data['details']) + [", ".join(data['files'])]
         output.append(row)
 
-    output_csv = "Name,StorageType,IsInstance,BuiltIn,Group,Files\n"
+    output_csv = "Name;StorageType;IsInstance;BuiltIn;Group;Families\n"
     for row in output:
-        output_csv += ",".join(row) + "\n"
+        output_csv += ";".join(row) + "\n"
 
     return output_csv
         
