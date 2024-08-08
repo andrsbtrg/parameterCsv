@@ -1,0 +1,48 @@
+import csv
+import os
+from io import StringIO
+
+# file_paths = os.listdir(csv_dir)  # Get all files in the directory
+
+
+def extract(uploaded_files):
+    unique_parameters = {}
+
+    for f in uploaded_files:
+        # Get the filename without the extension
+        filename = f.name
+
+        reader = csv.DictReader(f.getvalue().decode("utf-8").splitlines())
+        for row in reader:
+            param_name = row['Name']
+            parameter_group = row['Group'].replace("PG_","")
+            parameter_group = parameter_group.replace("GEOMETRY", "DIMENSIONS")
+            param_tuple = (row['StorageType'], row['IsInstance'], row['BuiltIn'], parameter_group)
+            
+            if param_name not in unique_parameters:
+                # If it's a new parameter, initialize its entry with the parameter details and filename
+                unique_parameters[param_name] = {
+                    'details': param_tuple,
+                    'files': [filename]
+                }
+            else:
+                # If the parameter already exists, append the filename to its list if it's not already there
+                if filename not in unique_parameters[param_name]['files']:
+                    unique_parameters[param_name]['files'].append(filename)
+
+    skip_params = ["ANALYTICAL_PROPERTIES", "IFC", "DATA"]
+    # Now, write the unique parameters to a new CSV file
+    output = []
+    fieldnames = ['Name', 'StorageType', 'IsInstance', 'Build-in', 'Parameter Category', 'Families']
+    for param_name, data in unique_parameters.items():
+        if data['details'][3] in skip_params:
+            continue
+        row = [param_name] + list(data['details']) + [", ".join(data['files'])]
+        output.append(row)
+
+    output_csv = "Name,StorageType,IsInstance,BuiltIn,Group,Files\n"
+    for row in output:
+        output_csv += ",".join(row) + "\n"
+
+    return output_csv
+        
