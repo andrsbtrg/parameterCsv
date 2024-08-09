@@ -1,10 +1,7 @@
 import streamlit as st
 import parameters
 
-def generateFile():
-    pass
-
-st.header("Hello")
+st.header("Unique parameters")
 
 output = ""
 
@@ -19,7 +16,7 @@ with st.container():
         ignore_groups
 
 with st.container():
-    uploaded_files = st.file_uploader("Upload csv files", type=["csv"], accept_multiple_files=True, on_change=generateFile )
+    uploaded_files = st.file_uploader("Upload csv files", type=["csv"], accept_multiple_files=True)
 
     if st.button("Generate Unique Parameters") and len(uploaded_files) > 0:
         ignore_groups = ignore_params.split(" ")

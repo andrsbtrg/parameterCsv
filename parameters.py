@@ -1,9 +1,5 @@
 import csv
-import os
-from io import StringIO
 from utils import str2bool
-
-# file_paths = os.listdir(csv_dir)  # Get all files in the directory
 
 
 def extract(uploaded_files, skip_params):
@@ -34,7 +30,6 @@ def extract(uploaded_files, skip_params):
                 if filename not in unique_parameters[param_name]['files']:
                     unique_parameters[param_name]['files'].append(filename)
 
-    print(next(iter(unique_parameters.items())))
     output = []
     for param_name, data in sorted(unique_parameters.items(), key=lambda x: (x[1]['details'][3], x[0])):
         if data['details'][3] in skip_params:
