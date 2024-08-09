@@ -18,7 +18,8 @@ def extract(uploaded_files, skip_params):
         reader = csv.DictReader(f.getvalue().decode("utf-8").splitlines())
         for row in reader:
             is_instance = str2bool(row['IsInstance'])
-            param_name = row['Name'] + " (default)" if is_instance else ""
+            appendix = " (default)" if is_instance else ""
+            param_name = row['Name'] + appendix
             parameter_group = row['Group'].replace("PG_","")
             parameter_group = parameter_group.replace("GEOMETRY", "DIMENSIONS").replace("REBAR_SYSTEM_LAYERS", "LAYERS")
 
