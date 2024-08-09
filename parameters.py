@@ -13,8 +13,6 @@ def extract(uploaded_files, skip_params):
         # Get the filename without the extension
         filename = f.name.replace(".csv","")
 
-        print(filename)
-
         reader = csv.DictReader(f.getvalue().decode("utf-8").splitlines())
         for row in reader:
             is_instance = str2bool(row['IsInstance'])
@@ -36,9 +34,9 @@ def extract(uploaded_files, skip_params):
                 if filename not in unique_parameters[param_name]['files']:
                     unique_parameters[param_name]['files'].append(filename)
 
-    # Now, write the unique parameters to a new CSV file
+    print(next(iter(unique_parameters.items())))
     output = []
-    for param_name, data in sorted(unique_parameters.items()):
+    for param_name, data in sorted(unique_parameters.items(), key=lambda x: (x[1]['details'][3], x[0])):
         if data['details'][3] in skip_params:
             continue
         row = [param_name] + list(data['details']) + [", ".join(data['files'])]
