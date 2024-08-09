@@ -1,6 +1,7 @@
 import csv
 import os
 from io import StringIO
+from utils import str2bool
 
 # file_paths = os.listdir(csv_dir)  # Get all files in the directory
 
@@ -16,9 +17,11 @@ def extract(uploaded_files, skip_params):
 
         reader = csv.DictReader(f.getvalue().decode("utf-8").splitlines())
         for row in reader:
-            param_name = row['Name']
+            is_instance = str2bool(row['IsInstance'])
+            param_name = row['Name'] + " (default)" if is_instance else ""
             parameter_group = row['Group'].replace("PG_","")
-            parameter_group = parameter_group.replace("GEOMETRY", "DIMENSIONS")
+            parameter_group = parameter_group.replace("GEOMETRY", "DIMENSIONS").replace("REBAR_SYSTEM_LAYERS", "LAYERS")
+
             param_tuple = (row['StorageType'], row['IsInstance'], row['BuiltIn'], parameter_group)
             
             if param_name not in unique_parameters:
@@ -34,7 +37,7 @@ def extract(uploaded_files, skip_params):
 
     # Now, write the unique parameters to a new CSV file
     output = []
-    for param_name, data in unique_parameters.items():
+    for param_name, data in sorted(unique_parameters.items()):
         if data['details'][3] in skip_params:
             continue
         row = [param_name] + list(data['details']) + [", ".join(data['files'])]
